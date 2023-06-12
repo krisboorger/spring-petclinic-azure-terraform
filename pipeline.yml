@@ -1,0 +1,34 @@
+trigger:
+  - master
+
+pool:
+  vmImage: ubuntu-latest
+
+jobs:
+- job: buildAndPush
+  displayName: 'Build and push docker images'
+  steps:
+  - script: docker login -u ${REPOSITORY_PREFIX} -p ${DOCKER_PASSWORD}
+    env:
+      DOCKER_PASSWORD: $(docker_password)
+    displayName: 'Login to dockerhub'
+  - script: mvn spring-boot:build-image -Pk8s -DREPOSITORY_PREFIX=${REPOSITORY_PREFIX}
+    displayName: 'Build docker images'
+  - script: ./scripts/pushImages.sh
+    displayName: 'Publish docker images'
+- deployment: deployK8s
+  dependsOn: buildAndPush
+  displayName: Deploy to AKS
+  environment: k8s.spring-petclinic
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - checkout: self
+        - task: DownloadSecureFile@1
+          name: kubeConfig
+          displayName: 'Download Kube Config'
+          inputs:
+            secureFile: 'config'
+        - script: kubectl rollout restart deployment -n spring-petclinic --kubeconfig $(kubeConfig.secureFilePath)
+          displayName: 'Redeploy'
