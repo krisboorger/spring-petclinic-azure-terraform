@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "$(terraform output kube_config)" > ./azurek8s
+export KUBECONFIG=$(pwd)/azurek8s
