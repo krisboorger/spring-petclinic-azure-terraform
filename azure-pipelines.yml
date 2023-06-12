@@ -29,6 +29,6 @@ jobs:
           name: kubeConfig
           displayName: 'Download Kube Config'
           inputs:
-            secureFile: 'config'
+            secureFile: 'azurek8s'
         - script: kubectl rollout restart deployment -n spring-petclinic --kubeconfig $(kubeConfig.secureFilePath)
           displayName: 'Redeploy'
