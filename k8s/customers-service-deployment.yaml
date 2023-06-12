@@ -8,7 +8,7 @@ metadata:
   name: customers-service
   namespace: spring-petclinic
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: customers-service
@@ -55,4 +55,16 @@ spec:
         - containerPort: 8080
         resources: {}
       restartPolicy: Always
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: customers-service
+                  operator: In
+                  values:
+                  - store
+              topologyKey: kubernetes.io/hostname
 status: {}
