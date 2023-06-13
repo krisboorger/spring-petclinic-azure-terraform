@@ -16,18 +16,7 @@ jobs:
     displayName: 'Build docker images'
   - script: ./scripts/pushImages.sh
     displayName: 'Publish docker images'
-- deployment: deployK8s
-  dependsOn: buildAndPush
-  displayName: Deploy to AKS
-  strategy:
-    runOnce:
-      deploy:
-        steps:
-        - checkout: self
-        - task: DownloadSecureFile@1
-          name: kubeConfig
-          displayName: 'Download Kube Config'
-          inputs:
-            secureFile: 'azurek8s'
-        - script: ./terraform/all.sh
-          displayName: 'Redeploy'
+- job: deployToK8s
+  displayName: 'Deploy to AKS'
+  steps:
+  - script: ./terraform/all.sh
