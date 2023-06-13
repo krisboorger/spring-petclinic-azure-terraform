@@ -21,3 +21,17 @@ variable "msi_id" {
   description = "The Managed Service Identity ID. Set this value if you're running this example using Managed Identity as the authentication method."
   default     = null
 }
+
+variable "resource_group_name" {
+  default     = "petclinic-k8s"
+}
+variable "log_analytics_workspace_location" {
+  default = "eastus"
+}
+variable log_analytics_workspace_name {
+    default = "Petclinic-LogAnalyticsWorkspace"
+}
+# refer https://azure.microsoft.com/pricing/details/monitor/ for log analytics pricing
+variable log_analytics_workspace_sku {
+    default = "PerGB2018"
+}
