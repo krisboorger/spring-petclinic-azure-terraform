@@ -16,7 +16,19 @@ jobs:
     displayName: 'Build docker images'
   - script: ./scripts/pushImages.sh
     displayName: 'Publish docker images'
-- job: deployToK8s
-  displayName: 'Deploy to AKS'
-  steps:
-  - script: ./terraform/all.sh
+- deployment: deployK8s
+  dependsOn: buildAndPush
+  displayName: Deploy to AKS
+  environment: k8s.spring-petclinic
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - checkout: self
+        - task: DownloadSecureFile@1
+          name: kubeConfig
+          displayName: 'Download Kube Config'
+          inputs:
+            secureFile: 'config'
+        - script: kubectl rollout restart deployment -n spring-petclinic --kubeconfig $(kubeConfig.secureFilePath)
+          displayName: 'Redeploy'
